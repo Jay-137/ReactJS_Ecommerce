@@ -1,4 +1,4 @@
-import { useState } from 'react'; // 1. Import useState
+import { useState,useRef,useEffect } from 'react'; // 1. Import useState
 import { useTheme } from '../context/ThemeContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, logout } from '../store/authSlice';
@@ -11,6 +11,17 @@ const Navbar = () => {
   const { isAuthenticated, user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const navRef=useRef(null);
+  useEffect(()=>{
+  const handleClickOutside=(event)=>{
+    if(navRef.current && !navRef.current.contains(event.target))
+      setIsOpen(false);
+  }
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  },[]);
   
   // 2. Add local state to track if the mobile menu is open
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +37,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md p-4 flex flex-wrap justify-between items-center transition-colors duration-300">
+    <nav ref={navRef} className="bg-white dark:bg-gray-800 shadow-md p-4 flex flex-wrap justify-between items-center transition-colors duration-300">
       
       {/* 3. Group the Logo and the Hamburger Button together */}
       <div className="flex justify-between items-center w-full sm:w-auto">
