@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { fetchProducts } from "../store/productSlice";
 import { useDispatch,useSelector } from "react-redux";
+import { addToCart } from "../store/cartSlice";
 const Home=()=>{
   const dispatch=useDispatch();
   const {data,status,error}=useSelector(state=>state.products);
@@ -52,7 +53,8 @@ const Home=()=>{
               </p>
               
               {/* Add to Cart Button (We will wire this up next!) */}
-              <button className="cursor-pointer mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+              <button className="cursor-pointer mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
+              onClick={()=>dispatch(addToCart(product))}>
                 Add to Cart
               </button>
             </div>
