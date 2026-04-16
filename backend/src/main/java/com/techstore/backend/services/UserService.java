@@ -11,6 +11,7 @@ import com.techstore.backend.dtos.AuthResponseDto;
 import com.techstore.backend.dtos.LoginRequestDto;
 import com.techstore.backend.dtos.UserDto;
 import com.techstore.backend.models.Cart;
+import com.techstore.backend.models.Role;
 import com.techstore.backend.repositories.UserRepository;
 
 @Service
@@ -28,6 +29,9 @@ public class UserService {
   public User registerUser(User user){
     if(userRepository.findByEmail(user.getEmail()).isPresent()){
       throw new RuntimeException("Email already exists");
+    }
+    if (user.getRole() == null) {
+        user.setRole(Role.USER); // Replace with whatever your Enum value is
     }
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     Cart cart=new Cart(user);

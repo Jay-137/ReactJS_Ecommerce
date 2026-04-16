@@ -70,9 +70,11 @@ public class OrderService {
       
       if(order.getStatus().equals("COMPLETE"))
         return;
-
       order.setStatus("COMPLETE");
-      order.getUser().getCart().getItems().clear();
+      List<Long> orderedProductIds=order.getItems().stream().map(item->item.getProductId()).collect(Collectors.toList());
+      Cart cart=order.getUser().getCart();
+      cart.getItems().removeIf(item->orderedProductIds.contains(item.getProduct().getId()));
+
       orderRepository.save(order);
       emailService.sendConfirmationMail(order.getUser().getEmail());
     }
@@ -99,7 +101,7 @@ public class OrderService {
       Page<Order> orderPage=orderRepository.findAll(spec,pageable);
       List<OrderDto>content=orderPage.getContent()
                                     .stream()
-                                    .map(this::converToOrderDto)
+                                    .map(this::convertToOrderDto)
                                     .collect(Collectors.toList());
       return new PaginatedResponseDto<>(content,
                                         orderPage.getNumber(),
@@ -114,10 +116,10 @@ public class OrderService {
       Order order=orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
       if(!order.getUser().getId().equals(userId))
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to view this order.");
-      return converToOrderDto(order);
+      return convertToOrderDto(order);
     }
 
-    private OrderDto converToOrderDto(Order order){
+    private OrderDto convertToOrderDto(Order order){
       List<OrderItemDto>itemDto=order.getItems().stream().map(this::convertToOrderItemDto).collect(Collectors.toList());
       return new OrderDto(order.getId(),order.getTotalAmount(),order.getStatus(),order.getCreatedAt(),itemDto);
     }

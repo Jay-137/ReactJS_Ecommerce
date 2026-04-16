@@ -18,9 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtAuthenticationFIlter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
-  public JwtAuthenticationFIlter(JwtService jwtService){
+  public JwtAuthenticationFilter(JwtService jwtService){
     this.jwtService=jwtService;
   }
 
@@ -42,7 +42,11 @@ public class JwtAuthenticationFIlter extends OncePerRequestFilter {
           jwt=authHeader.substring(7);
           userEmail=jwtService.extractMail(jwt);
           role=jwtService.extractRole(jwt);
-          SimpleGrantedAuthority authority= new SimpleGrantedAuthority("ROLE_"+role);
+          String formattedRole = role.toUpperCase();
+          if (!formattedRole.startsWith("ROLE_")) {
+              formattedRole = "ROLE_" + formattedRole;
+          }
+          SimpleGrantedAuthority authority = new SimpleGrantedAuthority(formattedRole);
           if(userEmail!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             if(jwtService.isTokenValid(jwt, userEmail)){
               UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(userEmail,null,Collections.singletonList(authority));

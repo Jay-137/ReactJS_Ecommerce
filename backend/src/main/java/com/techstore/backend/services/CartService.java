@@ -24,10 +24,12 @@ public class CartService {
     
     Cart cart=getCartByUserId(userId);
     Product product=getProductById(productId);
-
+    if(quantity<=0)
+      return removeItemFromCart(userId, productId);
     Optional<CartItem>itemOpt=cart.getItems().stream().filter(item->item.getProduct().getId().equals(productId)).findFirst();
     if(itemOpt.isPresent()){
       CartItem item=itemOpt.get();
+
       item.setQuantity(item.getQuantity()+quantity);
     }else{
       CartItem item=new CartItem(cart,product,quantity);

@@ -13,11 +13,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-  private final JwtAuthenticationFIlter jwtAuthFilter;
+  private final JwtAuthenticationFilter jwtAuthFilter;
   private final CustomAccessDeniedHandler customAccessDeniedHandler;
   private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-  public SecurityConfig(JwtAuthenticationFIlter jwtAuthFilter,CustomAccessDeniedHandler customAccessDeniedHandler,CustomAuthenticationEntryPoint customAuthenticationEntryPoint){
+  public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,CustomAccessDeniedHandler customAccessDeniedHandler,CustomAuthenticationEntryPoint customAuthenticationEntryPoint){
     this.jwtAuthFilter=jwtAuthFilter;
     this.customAccessDeniedHandler=customAccessDeniedHandler;
     this.customAuthenticationEntryPoint=customAuthenticationEntryPoint;
