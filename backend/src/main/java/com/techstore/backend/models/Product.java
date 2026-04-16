@@ -21,6 +21,7 @@ public class Product {
   @Column(columnDefinition = "TEXT")
   private String description;
   
+  private String imagePublicId;
   private String imageUrl;
 
   @NotNull(message = "Price is required")
@@ -38,6 +39,12 @@ private Boolean featured;
 public String getCategory() {
     return category;
 }
+public String getImagePublicId() {
+    return imagePublicId;
+}
+public void setImagePublicId(String imagePublicId) {
+    this.imagePublicId = imagePublicId;
+}
 public void setCategory(String category) {
     this.category = category;
 }
@@ -47,7 +54,7 @@ public String getBrand() {
 public void setBrand(String brand) {
     this.brand = brand;
 }
-public Boolean getfeatured() {
+public Boolean getFeatured() {
     return featured;
 }
 public void setFeatured(Boolean featured) {

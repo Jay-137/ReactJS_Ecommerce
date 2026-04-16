@@ -5,5 +5,8 @@ public record ProductDto(
   String name,
   String description,
   Double price,
-  String imageUrl
+  String imageUrl,
+  String brand,
+  String category,
+  Boolean featured
 ) {}

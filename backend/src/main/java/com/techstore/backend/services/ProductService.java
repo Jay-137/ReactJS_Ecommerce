@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.techstore.backend.dtos.PaginatedResponseDto;
@@ -26,15 +27,18 @@ public class ProductService {
     this.productRepository=productRepository;
     this.fileService=fileService;
   }
-  public Product createProduct(Product product){
-    return productRepository.save(product);
+  public ProductDto createProduct(Product product){
+    return convertToDto(productRepository.save(product));
   }
-  public Product updateProduct(Long id,Product product){
+  public ProductDto updateProduct(Long id,Product product){
     Product existing=getProductById(id);
     existing.setName(product.getName());
+    existing.setBrand(product.getBrand());
+    existing.setCategory(product.getCategory());
+    existing.setFeatured(product.getFeatured());
+    existing.setPrice(product.getPrice());
     existing.setDescription(product.getDescription());
-    existing.setDescription(product.getDescription());
-    return productRepository.save(existing);
+    return convertToDto(productRepository.save(existing));
   }
   public PaginatedResponseDto<ProductDto> getAllProducts(ProductQueryDto query){
 
@@ -64,12 +68,22 @@ public class ProductService {
     return productRepository.findById(id).orElseThrow(()->new RuntimeException("Product not found with id:"+id));
   }
 
-  public Product saveImage(Long id,MultipartFile file){
+  public ProductDto saveImage(Long id,MultipartFile file){
     Product product=getProductById(id);
     try{
-      String path=fileService.saveImage(file);
-      product.setImageUrl(path);
-      return productRepository.save(product);
+      Map<String, String> uploadData=fileService.saveImage(file);
+      String oldPublicId=product.getImagePublicId();
+      product.setImageUrl(uploadData.get("url"));
+      product.setImagePublicId(uploadData.get("publicId"));
+      Product savedProduct=productRepository.save(product);
+      if(oldPublicId!=null){
+        try{
+          fileService.deleteImage(oldPublicId);
+        }catch(IOException e){
+          System.out.println("Warning: Failed to delete old image");
+        }
+      }
+      return convertToDto(savedProduct);
     }
     catch(IOException e){
       throw new RuntimeException("Could not store image. Error: " + e.getMessage());
@@ -77,9 +91,18 @@ public class ProductService {
   }
   public void deleteProduct(Long id){
     Product product=getProductById(id);
+    String oldPublicId=product.getImagePublicId();
+    if (oldPublicId != null){
+      try{
+      fileService.deleteImage(oldPublicId);
+    }
+    catch (IOException e){
+      System.out.println("Warning: Failed to delete old image");
+    }
+    }
     productRepository.delete(product);
   }
   private ProductDto convertToDto(Product item){
-    return new ProductDto(item.getId(), item.getName(), item.getDescription() , item.getPrice(), item.getImageUrl());
+    return new ProductDto(item.getId(), item.getName(), item.getDescription() , item.getPrice(), item.getImageUrl(),item.getBrand(),item.getCategory(),item.getFeatured());
   }
 }

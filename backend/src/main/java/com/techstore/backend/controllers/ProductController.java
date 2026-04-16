@@ -1,5 +1,6 @@
 package com.techstore.backend.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,31 +34,27 @@ public class ProductController {
     
   }
   @GetMapping("/{id}")
-  public ProductDto geProductById(@PathVariable Long id){
+  public ProductDto getProductById(@PathVariable Long id){
     Product product=productService.getProductById(id);
-    return convertToDTO(product);
+    return new ProductDto(product.getId(), product.getName(), product.getDescription(), product.getPrice(), product.getImageUrl(), product.getBrand(), product.getCategory(), product.getFeatured());
   }
   @PostMapping("/{id}/image")
   public ProductDto uploadImage(@PathVariable Long id,@RequestParam("image") MultipartFile image){
-    Product updatedProduct=productService.saveImage(id, image);
-    return new ProductDto(updatedProduct.getId(),updatedProduct.getName(),updatedProduct.getDescription(),updatedProduct.getPrice(),updatedProduct.getImageUrl());
+    return productService.saveImage(id, image);
   }
   @PostMapping
   public ProductDto createProduct(@Valid @RequestBody Product product){
-    return convertToDTO(productService.createProduct(product));
+    return productService.createProduct(product);
   }
   @PutMapping("/{id}")
-  public ProductDto updateProduct(@PathVariable Long id,@RequestBody Product product){
-    return convertToDTO(productService.updateProduct(id, product));
+  public ProductDto updateProduct(@PathVariable Long id,@Valid @RequestBody Product product){
+    return productService.updateProduct(id, product);
   }
   
   @DeleteMapping("/{id}")
-  public void deleteProduct(@PathVariable Long id){
-    productService.deleteProduct(id);
-  }
-
-  private ProductDto convertToDTO(Product product){
-    return new ProductDto(product.getId(),product.getName(),product.getDescription(),product.getPrice(),product.getImageUrl());
+  public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
+      productService.deleteProduct(id);
+      return ResponseEntity.noContent().build();
   }
 
 }
