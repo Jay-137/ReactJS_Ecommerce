@@ -4,9 +4,9 @@ import java.security.Key;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.techstore.backend.models.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,10 +24,10 @@ public class JwtService {
 
 
 
-  public String generateToken(User user){
+  public String generateToken(UserDetails user){
     return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("role", user.getRole().name())
+                .setSubject(user.getUsername())
+                .claim("role", user.getAuthorities().iterator().next().getAuthority().replace("ROLE_",""))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
