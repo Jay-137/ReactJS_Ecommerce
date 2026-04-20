@@ -1,21 +1,34 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const savedAuth=JSON.parse(localStorage.getItem("authState"));
-const initState=savedAuth || {isAuthenticated:false,user:null};
+const savedToken=localStorage.getItem("jwt_token");
+const savedUser=JSON.parse(localStorage.get("user"));
+
+const initState={
+  isAuthenticated:!!savedToken,
+  token:savedToken||null,
+  user:savedUser||null
+}
 const authSlice=createSlice({
   name:"auth",
   initialState:initState,
   reducers:{
-    login(state,action){
-      state.user={ name: action.payload };
+    setCredentials(state,action){
+      const {token,user}=action.payload;
+      state.user=user;
       state.isAuthenticated=true;
+      state.token=token;
+      localStorage.setItem("jwt_token",token);
+      localStorage.setItem("user",JSON.stringify(user));
     },
     logout(state){
       state.user=null;
+      state.token=null;
       state.isAuthenticated=false;
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("user");
     }
   }
 });
 
-export const {login,logout}=authSlice.actions;
+export const {setCredentials,logout}=authSlice.actions;
 export default authSlice.reducer;
