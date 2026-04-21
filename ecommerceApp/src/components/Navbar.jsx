@@ -1,7 +1,7 @@
 import { useState,useRef,useEffect } from 'react'; // 1. Import useState
 import { useTheme } from '../context/ThemeContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, logout } from '../store/authSlice';
+import { setCredentials, logout } from '../store/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -34,6 +34,13 @@ const Navbar = () => {
     } else {
       toast.error("Please log in to view your cart!");
     }
+  };
+  const handleLogout = () => {
+    // Clear Redux state & localStorage
+    dispatch(logout()); 
+    // Kick them back to the login screen
+    navigate('/login');
+    setIsOpen(false);
   };
 
   return (
@@ -83,8 +90,11 @@ const Navbar = () => {
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <span className="text-sm text-gray-600 dark:text-gray-300">Hi, {user?.name ?? "Guest"}</span>
+              {user?.role === 'ADMIN' && (
+              <Link to="/admin" style={{ color: '#ffc107', textDecoration: 'none' }}>Admin Panel</Link>
+              )}
               <button 
-                onClick={() => { dispatch(logout()); setIsOpen(false); }} 
+                onClick={handleLogout} 
                 className="text-sm font-semibold text-red-500 hover:text-red-600 cursor-pointer"
               >
                 Logout
@@ -92,7 +102,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button 
-              onClick={() => { dispatch(login("Jayanaath")); setIsOpen(false); }} 
+              onClick={() => {setIsOpen(false);navigate("/login") }} 
               className="text-sm font-semibold text-blue-600 hover:text-blue-500 cursor-pointer"
             >
               Login

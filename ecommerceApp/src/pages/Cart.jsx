@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeFromCart } from "../store/cartSlice";
 import CartItem from "../components/CartItem";
 import { useCallback,useMemo, useState } from "react";
 import { clearCart } from "../store/cartSlice";
@@ -14,7 +13,7 @@ const Cart=()=>{
   const navigate=useNavigate();
 
   const onRemove=useCallback((id)=>{
-    dispatch(removeFromCart(id));
+    // dispatch(removeFromCart(id));
   },[dispatch]);
 
   const handleCheckout = useCallback( () => {

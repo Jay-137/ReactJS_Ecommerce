@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { fetchProducts } from "../store/productSlice";
 import { useDispatch,useSelector } from "react-redux";
-import { addToCart } from "../store/cartSlice";
+import { setCart } from "../store/cartSlice";
 import {toast} from "react-hot-toast";
 const Home=()=>{
   const dispatch=useDispatch();
@@ -61,7 +61,7 @@ const Home=()=>{
                   toast.error("You must be logged in to add items to cart!");
                 else{
                   toast.success("Added item to cart!")
-                dispatch(addToCart(product))
+                // dispatch(addToCart(product))
                 }
               }}>
                 Add to Cart

@@ -6,6 +6,8 @@ import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 const router=createBrowserRouter([
   {
     path:"/",
@@ -14,6 +16,13 @@ const router=createBrowserRouter([
       {
         index:true,
         element:<Home/>
+      },
+      {
+        path:"login",
+        element:<Login/>
+      },{
+        path:"register",
+        element:<Register/>
       },
       {
         element:<ProtectedRoute/>,

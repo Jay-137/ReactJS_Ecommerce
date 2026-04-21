@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const savedToken=localStorage.getItem("jwt_token");
-const savedUser=JSON.parse(localStorage.get("user"));
+const savedUser=JSON.parse(localStorage.getItem("user"));
 
 const initState={
   isAuthenticated:!!savedToken,
