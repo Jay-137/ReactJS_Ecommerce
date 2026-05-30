@@ -77,6 +77,7 @@ public class OrderService {
 
       orderRepository.save(order);
       emailService.sendConfirmationMail(order.getUser().getEmail());
+      System.out.println("Initiating email");
     }
 
     @Transactional
