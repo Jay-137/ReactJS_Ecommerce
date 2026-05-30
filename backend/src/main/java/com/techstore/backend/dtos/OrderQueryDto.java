@@ -1,6 +1,6 @@
 package com.techstore.backend.dtos;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class OrderQueryDto {
   private int pageNo=0;
@@ -10,8 +10,8 @@ public class OrderQueryDto {
 
   private Long userId;
   private String status;
-  private LocalDateTime start;
-  private LocalDateTime end;
+  private LocalDate start;
+  private LocalDate end;
 
   
   public int getPageNo() {
@@ -44,16 +44,16 @@ public class OrderQueryDto {
   public void setStatus(String status) {
     this.status = status;
   }
-  public LocalDateTime getStart() {
+  public LocalDate getStart() {
     return start;
   }
-  public void setStart(LocalDateTime start) {
+  public void setStart(LocalDate start) {
     this.start = start;
   }
-  public LocalDateTime getEnd() {
+  public LocalDate getEnd() {
     return end;
   }
-  public void setEnd(LocalDateTime end) {
+  public void setEnd(LocalDate end) {
     this.end = end;
   }
   public Long getUserId() {

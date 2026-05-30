@@ -1,10 +1,16 @@
 import axios from "axios";
-import store from "../store/store";
 import { logout } from "../store/authSlice";
 import { navigateTo } from "../utils/navigateFunction";
 
+//prevent circular dependency due to driect import
+let store;
+export const injectStore=(_store)=>{
+  store=_store;
+}
+
+
 const axiosInstance=axios.create({
-  baseURL:'http://localhost:8080',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
 });
 
 axiosInstance.interceptors.request.use(
@@ -24,6 +30,7 @@ axiosInstance.interceptors.response.use(
   (error)=>{
     if ( error.response?.status === 401 &&  window.location.pathname !== "/login"){
           console.warn("Unauthorized! Clearing session...");
+          if(store)
           store.dispatch(logout());
           navigateTo("/login");
     }

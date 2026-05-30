@@ -119,6 +119,26 @@ public class OrderService {
       return convertToOrderDto(order);
     }
 
+    public PaginatedResponseDto<OrderDto> getAllPlatformOrders(OrderQueryDto query){
+      Sort sort=query.getSortDir().equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(query.getSortBy()).ascending():Sort.by(query.getSortBy()).descending();
+
+      Pageable page=PageRequest.of(query.getPageNo(), query.getPageSize(), sort);
+
+      Specification<Order> spec=Specification.where(OrderSpecification.hasUserId(query.getUserId()))
+      .and(OrderSpecification.hasStatus(query.getStatus())).and(OrderSpecification.createdAfter(query.getStart())).and(OrderSpecification.createdBefore(query.getEnd()));
+
+      Page<Order> orderPage=orderRepository.findAll(spec, page);
+      List<OrderDto> orderDtos=orderPage.getContent().stream().map(this::convertToOrderDto).collect(Collectors.toList());
+      return new PaginatedResponseDto<>(
+        orderDtos,
+        orderPage.getNumber(),
+        orderPage.getSize(),
+        orderPage.getTotalElements(),
+        orderPage.getTotalPages(),
+        orderPage.isLast()
+      );
+    }
+
     private OrderDto convertToOrderDto(Order order){
       List<OrderItemDto>itemDto=order.getItems().stream().map(this::convertToOrderItemDto).collect(Collectors.toList());
       return new OrderDto(order.getId(),order.getTotalAmount(),order.getStatus(),order.getCreatedAt(),itemDto);

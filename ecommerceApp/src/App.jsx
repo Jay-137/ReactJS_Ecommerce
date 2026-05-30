@@ -8,6 +8,10 @@ import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ProductDetail from "./pages/ProductDetails";
+import Checkout from "./pages/Checkout";
+import UserDashboard from "./pages/UserDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 const router=createBrowserRouter([
   {
     path:"/",
@@ -23,6 +27,9 @@ const router=createBrowserRouter([
       },{
         path:"register",
         element:<Register/>
+      },{
+        path:"/product/:id",
+        element:<ProductDetail/>
       },
       {
         element:<ProtectedRoute/>,
@@ -31,8 +38,26 @@ const router=createBrowserRouter([
             path:"cart",
             element:<Cart/>
           },
-          { path: "order-success", element: <OrderSuccess /> }
+          {
+            path:"checkout",
+            element:<Checkout/>
+          },
+          { 
+            path: "order-success", 
+            element: <OrderSuccess />
+          },
+          { path: "dashboard",
+            element: <UserDashboard /> 
+          }
         ]
+      },
+      {
+        element:<ProtectedRoute requireAdmin={true}/>,
+        children:[{
+          path:"admin",
+          element:<AdminDashboard/>
+        }
+      ]
       }
     ]
   },

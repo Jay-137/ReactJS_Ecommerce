@@ -2,6 +2,8 @@ import {configureStore} from "@reduxjs/toolkit";
 import cartReducer from "./cartSlice";
 import ProductReducer from "./productSlice";
 import AuthReducer from "./authSlice";
+import { injectStore } from "../api/axiosInstance";//prevent circular wait due to cartslice waiting on axiosinstance
+
 const store=configureStore({
   reducer:{
     cart:cartReducer,
@@ -9,6 +11,7 @@ const store=configureStore({
     auth:AuthReducer,
   }
 });
+injectStore(store);
 export default store;
 
 store.subscribe(()=>{

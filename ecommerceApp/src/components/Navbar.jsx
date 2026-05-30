@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, logout } from '../store/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { fetchCart } from '../store/cartSlice';
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const cartQuantity = useSelector(state => state.cart.totalQuantity);
   const { isAuthenticated, user } = useSelector(state => state.auth);
+  const cartStatus=useSelector(state=>state.cart.status);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const navRef=useRef(null);
@@ -23,6 +25,8 @@ const Navbar = () => {
     };
   },[]);
   
+
+
   // 2. Add local state to track if the mobile menu is open
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,6 +39,11 @@ const Navbar = () => {
       toast.error("Please log in to view your cart!");
     }
   };
+    useEffect(() => {
+    if (isAuthenticated && cartStatus === 'Idle') {
+      dispatch(fetchCart());
+    }
+  }, [isAuthenticated, cartStatus, dispatch]);
   const handleLogout = () => {
     // Clear Redux state & localStorage
     dispatch(logout()); 
@@ -89,7 +98,9 @@ const Navbar = () => {
         <div className="flex items-center gap-4 sm:border-r sm:pr-4 border-gray-300 dark:border-gray-600 w-full sm:w-auto justify-center">
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600 dark:text-gray-300">Hi, {user?.name ?? "Guest"}</span>
+              <Link to="/dashboard" className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 font-semibold cursor-pointer">
+                Hi, {user?.name ?? "Guest"}
+              </Link>
               {user?.role === 'ADMIN' && (
               <Link to="/admin" style={{ color: '#ffc107', textDecoration: 'none' }}>Admin Panel</Link>
               )}

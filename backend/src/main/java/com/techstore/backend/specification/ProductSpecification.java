@@ -8,11 +8,11 @@ public class ProductSpecification {
   private ProductSpecification(){}
   public static Specification<Product> hasCategory(String category){
     return (root,query,cb)->{
-      return category==null?null:cb.equal(root.get("category"), category);
+      return category==null?null:cb.like(root.get("category"), "%"+category+"%");
       };
     };
     public static Specification<Product> hasBrand(String brand){
-      return (root,query,cb)->brand==null?null:cb.equal(root.get("brand"), brand);
+      return (root,query,cb)->brand==null?null:cb.like(root.get("brand"), "%"+brand+"%");
     };
     public static Specification<Product> isFeatured(Boolean featured){
       return (root,query,cb)->featured==null?null:cb.equal(root.get("featured"), featured);

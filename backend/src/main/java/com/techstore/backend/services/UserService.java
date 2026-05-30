@@ -44,7 +44,7 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  public AuthResponseDto loginUser(@RequestBody LoginRequestDto loginRequestDto){
+  public AuthResponseDto loginUser(LoginRequestDto loginRequestDto){
     Authentication authentication=authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.email(), loginRequestDto.password()));
     Object principal = authentication.getPrincipal();
     CustomUserDetails userDetails = (CustomUserDetails) principal;

@@ -1,5 +1,7 @@
 package com.techstore.backend.controllers;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +36,7 @@ public class CartController {
     User user=userService.getAuthenticatedUser();
     Cart savedCart=cartService.addToCart(
                                         user.getId(),
-                                        incomingCartRequest.productid(),
+                                        incomingCartRequest.productId(),
                                         incomingCartRequest.quantity());
     return convertToDto(savedCart);
   }
@@ -53,6 +55,8 @@ public class CartController {
   }
   @PutMapping("/update")
   public CartDto updateCart(@RequestParam Long productId, @RequestParam Integer quantity){
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println("AUTH: " + auth);
     User user=userService.getAuthenticatedUser();
     Cart cart=cartService.updateCart(user.getId(), productId, quantity);
     return convertToDto(cart);
@@ -72,7 +76,7 @@ public class CartController {
     return item.stream().map(it->new CartItemDto(it.getProduct().getId(),
                                                   it.getProduct().getName(),
                                                   it.getProduct().getPrice(),
-                                                  it.getQuantity())).collect(Collectors.toList());
+                                                  it.getQuantity(),it.getProduct().getImageUrl())).collect(Collectors.toList());
   }
  
 }

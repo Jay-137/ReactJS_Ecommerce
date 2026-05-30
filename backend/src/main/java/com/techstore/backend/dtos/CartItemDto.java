@@ -4,6 +4,7 @@ public record CartItemDto(
 Long productId,
 String productName,
 Double price,
-Integer quantity
+Integer quantity,
+String imageUrl
 ) {
 }

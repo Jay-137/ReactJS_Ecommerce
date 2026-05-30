@@ -1,33 +1,55 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";import axios from "axios";
 export const fetchProducts=createAsyncThunk(
   "products/fetch",
-  async ()=>{
-    const response=await axios.get('https://fakestoreapi.com/products');
+  async (queryParams={},{rejectWithValue})=>{
+    try{
+      const response=await axios.get('http://localhost:8080/api/products',{
+      params:queryParams
+    });
     return response.data;
+    }catch(err){
+      return rejectWithValue(err.response?.data?.message|| "Failed to fetch products");
+    }
+    
   }
-);
+); 
 
 const productSlice=createSlice({
   name:"products",
   initialState:{
     data:[],
+    pagination:{
+      pageNo: 0,
+      pageSize: 8,
+      totalElements: 0,
+      totalPages: 0,
+      isLast: true
+    },
     status:"Idle",
     error:null
   },
-  reducers:{
+  reducers:{ 
 
   },
   extraReducers:(builder)=>{
     builder.addCase(fetchProducts.pending,(state)=>{
       state.status="Loading";
+      state.error=null;
     })
     .addCase(fetchProducts.fulfilled,(state,action)=>{
       state.status="Success";
-      state.data=action.payload;
+      state.data=action.payload.content;
+      state.pagination={
+        pageNo: action.payload.pageNo,
+          pageSize: action.payload.pageSize,
+          totalElements: action.payload.totalElements,
+          totalPages: action.payload.totalPages,
+          isLast: action.payload.isLast
+      }
     })
     .addCase(fetchProducts.rejected,(state,action)=>{
       state.status="Failed";
-      state.error=action.error.message;
+      state.error=action.payload || action.error.message;
     });
   }
 

@@ -46,7 +46,7 @@ public class FileService {
       // Files.copy(file.getInputStream(),targetLocation,StandardCopyOption.REPLACE_EXISTING);
       // return "/uploads/"+uniqueFileName;
 
-      Map<?,?> uploadResult=cloudinary.uploader().upload(file.getInputStream(), ObjectUtils.asMap("resource_type","image","folder","products"));
+      Map<?,?> uploadResult=cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type","image","folder","products"));
       Map<String, String> result = new HashMap<>();
       result.put("url", uploadResult.get("secure_url").toString());
       result.put("publicId", uploadResult.get("public_id").toString());
