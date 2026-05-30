@@ -10,7 +10,9 @@ const Home = () => {
   const { data, status, error, pagination } = useSelector(state => state.products);
   const { isAuthenticated } = useSelector(state => state.auth);
 
-  // Added brand, minPrice, and maxPrice to match backend ProductQueryDto
+  // Added state to handle mobile filter toggling
+  const [showFilters, setShowFilters] = useState(false);
+
   const [query, setQuery] = useState({
     pageNo: 0,
     pageSize: 5,
@@ -23,16 +25,11 @@ const Home = () => {
   });
 
   useEffect(() => {
-    
-    const debounceFn=setTimeout(()=>{
-      // We clean up empty price strings so we don't send "?minPrice=" to the backend
+    const debounceFn = setTimeout(() => {
       const activeQuery = { ...query };
-    // if (activeQuery.minPrice === "") delete activeQuery.minPrice;
-    // if (activeQuery.maxPrice === "") delete activeQuery.maxPrice;
-
-    dispatch(fetchProducts(activeQuery));
-    },500);
-    return ()=>clearTimeout(debounceFn);
+      dispatch(fetchProducts(activeQuery));
+    }, 500);
+    return () => clearTimeout(debounceFn);
   }, [query, dispatch]);
 
   const handleFilterChange = (e) => {
@@ -47,100 +44,114 @@ const Home = () => {
   return (
     <div className="p-4 sm:p-8 flex flex-col md:flex-row gap-8">
       
-      {/* Sidebar Filters */}
-      <aside className="w-full md:w-1/4 flex flex-col gap-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md h-fit sticky top-20">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white border-b pb-2">Filters</h3>
+      {/* Sidebar Filters - Removed 'sticky top-20' to make it stable at the top */}
+      <aside className="w-full md:w-1/4 flex flex-col gap-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md h-fit">
         
-        {/* Category */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Category</label>
-          <input 
-            type="text" 
-            name="category" 
-            placeholder="e.g. Electronics" 
-            value={query.category} 
-            onChange={handleFilterChange}
-            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+        {/* Header with Mobile Toggle Button */}
+        <div className="flex justify-between items-center border-b pb-2 md:border-none md:pb-0">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white">Filters</h3>
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className="md:hidden bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1 rounded text-sm font-semibold"
+          >
+            {showFilters ? "Hide" : "Show"}
+          </button>
         </div>
-
-        {/* Brand */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Brand</label>
-          <input 
-            type="text" 
-            name="brand" 
-            placeholder="e.g. Samsung" 
-            value={query.brand} 
-            onChange={handleFilterChange}
-            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        {/* Price Range */}
-        <div className="flex gap-4">
-          <div className="flex flex-col gap-2 w-1/2">
-            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Min Price ($)</label>
+        
+        {/* Filter Inputs - Hidden on mobile unless toggled, always flex on md+ screens */}
+        <div className={`${showFilters ? 'flex' : 'hidden'} md:flex flex-col gap-6 mt-2 md:mt-0`}>
+          
+          {/* Category */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Category</label>
             <input 
-              type="number" 
-              name="minPrice" 
-              placeholder="0" 
-              min="0"
-              value={query.minPrice} 
+              type="text" 
+              name="category" 
+              placeholder="e.g. Electronics" 
+              value={query.category} 
               onChange={handleFilterChange}
               className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
-          <div className="flex flex-col gap-2 w-1/2">
-            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Max Price ($)</label>
+
+          {/* Brand */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Brand</label>
             <input 
-              type="number" 
-              name="maxPrice" 
-              placeholder="Max" 
-              min="0"
-              value={query.maxPrice} 
+              type="text" 
+              name="brand" 
+              placeholder="e.g. Samsung" 
+              value={query.brand} 
               onChange={handleFilterChange}
               className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
-        </div>
 
-        {/* Sort By */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Sort By</label>
-          <select 
-            name="sortBy" 
-            value={query.sortBy} 
-            onChange={handleFilterChange}
-            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
-          >
-            <option value="id">Newest Arrivals</option>
-            <option value="price">Price</option>
-            <option value="name">Name</option>
-          </select>
-        </div>
+          {/* Price Range */}
+          <div className="flex gap-4">
+            <div className="flex flex-col gap-2 w-1/2">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Min Price ($)</label>
+              <input 
+                type="number" 
+                name="minPrice" 
+                placeholder="0" 
+                min="0"
+                value={query.minPrice} 
+                onChange={handleFilterChange}
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            <div className="flex flex-col gap-2 w-1/2">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Max Price ($)</label>
+              <input 
+                type="number" 
+                name="maxPrice" 
+                placeholder="Max" 
+                min="0"
+                value={query.maxPrice} 
+                onChange={handleFilterChange}
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+          </div>
 
-        {/* Sort Direction */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Direction</label>
-          <select 
-            name="sortDir" 
-            value={query.sortDir} 
-            onChange={handleFilterChange}
-            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
+          {/* Sort By */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Sort By</label>
+            <select 
+              name="sortBy" 
+              value={query.sortBy} 
+              onChange={handleFilterChange}
+              className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
+            >
+              <option value="id">Newest Arrivals</option>
+              <option value="price">Price</option>
+              <option value="name">Name</option>
+            </select>
+          </div>
+
+          {/* Sort Direction */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Direction</label>
+            <select 
+              name="sortDir" 
+              value={query.sortDir} 
+              onChange={handleFilterChange}
+              className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
+            >
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
+          
+          {/* Reset Filters Button */}
+          <button
+            onClick={() => setQuery({ pageNo: 0, pageSize: 5, sortBy: "id", sortDir: "desc", category: "", brand: "", minPrice: "", maxPrice: "" })}
+            className="mt-2 w-full py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded transition-colors cursor-pointer"
           >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </select>
+            Clear Filters
+          </button>
         </div>
-        
-        {/* Reset Filters Button */}
-        <button
-          onClick={() => setQuery({ pageNo: 0, pageSize: 8, sortBy: "id", sortDir: "desc", category: "", brand: "", minPrice: "", maxPrice: "" })}
-          className="mt-2 w-full py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded transition-colors"
-        >
-          Clear Filters
-        </button>
       </aside>
 
       {/* Main Content Area */}
@@ -202,7 +213,6 @@ const Home = () => {
                     onClick={() => {
                       if (!isAuthenticated) toast.error("You must be logged in to add items to cart!");
                       else {
-                        
                         dispatch(addToCart({productId:product.id,quantity:1}));
                         toast.success("Added item to cart!");
                       }
